@@ -1,0 +1,76 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+
+{% block title %}Listings by {{ view.kwargs.username }} - HouseFinder{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="profile-section">
+        <div class="profile-header">
+            <h1>{{ view.kwargs.username }}'s Listings</h1>
+        </div>
+        {% if houses %}
+            {% with owner_profile=houses.0.owner.profile %}
+            <div class="contact-info">
+                {% if owner_profile.phone_num %}
+                <div class="contact-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                    </svg>
+                    <span>{{ owner_profile.phone_num }}</span>
+                </div>
+                {% endif %}
+                {% if owner_profile.tg %}
+                <div class="contact-item">
+                    <a href="https://t.me/{{ owner_profile.tg }}" target="_blank" rel="noopener">Telegram</a>
+                </div>
+                {% endif %}
+                {% if owner_profile.fb %}
+                <div class="contact-item">
+                    <a href="https://facebook.com/{{ owner_profile.fb }}" target="_blank" rel="noopener">Facebook</a>
+                </div>
+                {% endif %}
+                {% if owner_profile.ig %}
+                <div class="contact-item">
+                    <a href="https://instagram.com/{{ owner_profile.ig }}" target="_blank" rel="noopener">Instagram</a>
+                </div>
+                {% endif %}
+            </div>
+            {% endwith %}
+        {% endif %}
+    </div>
+
+    <div class="house-grid">
+        {% for house in houses %}
+        <div class="house-card">
+            <div class="house-image-wrapper">
+                {% if house.images.first %}
+                    <img src="{{ house.images.first.image.url }}" alt="{{ house.title|escape }}" class="house-image">
+                {% else %}
+                    <img src="https://via.placeholder.com/400x240.png?text=No+Image" alt="No image available" class="house-image">
+                {% endif %}
+            </div>
+            <div class="house-content">
+                <h2 class="house-title">{{ house.title|escape }}</h2>
+                <div class="house-price">{{ house.price|floatformat:0 }} DZD</div>
+                <div class="house-location">
+                    <span>{{ house.municipality }}, {{ house.state }}</span>
+                </div>
+                <div class="house-actions">
+                    <a href="{% url 'detail' house.access_hash %}" class="btn btn-view">View Details</a>
+                    {% if user.is_authenticated and user == house.owner %}
+                        <a href="{% url 'update' house.access_hash %}" class="btn btn-edit">Edit</a>
+                        <a href="{% url 'delete' house.access_hash %}" class="btn btn-delete">Delete</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <h2>No Properties Listed</h2>
+            <p>{{ view.kwargs.username }} hasn't posted any properties yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

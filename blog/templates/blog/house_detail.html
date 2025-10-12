@@ -1,0 +1,111 @@
+{% extends 'blog/base.html' %}
+{% block title %}{{ object.title|escape }} - HouseFinder{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <div class="main-content">
+        <div class="gallery-section">
+            {% if object.images.all %}
+                <img src="{{ object.images.first.image.url }}" alt="{{ object.title|escape }}" class="main-image" id="mainImage">
+                <div class="thumbnail-grid">
+                    {% for img in object.images.all %}
+                    <div class="thumbnail {% if forloop.first %}active{% endif %}"
+                         onclick="changeImage('{{ img.image.url }}', this)">
+                        <img src="{{ img.image.url }}" alt="Thumbnail {{ forloop.counter }}">
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <img src="https://via.placeholder.com/1100x500.png?text=No+Image+Available"
+                     alt="No image available" class="main-image">
+            {% endif %}
+        </div>
+
+        <div class="house-info">
+            <h1 class="house-title">{{ object.title|escape }}</h1>
+            <div class="house-location">
+                {{ object.municipality }}, {{ object.district }}, {{ object.state }}
+            </div>
+            <div class="house-description">
+                {{ object.description|linebreaksbr }}
+            </div>
+            <div class="house-specs">
+                <div class="spec-item">
+                    <div class="spec-label">Type</div>
+                    <div class="spec-value">{{ object.get_operationType_display }}</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Size</div>
+                    <div class="spec-value">{{ object.length|floatformat:0 }}x{{ object.width|floatformat:0 }} m²</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Faces</div>
+                    <div class="spec-value">{{ object.faces }}</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Status</div>
+                    <div class="spec-value">{{ object.get_status_display }}</div>
+                </div>
+            </div>
+        </div>
+
+        {% if object.latitude and object.longitude %}
+        <div class="map-container">
+            <iframe src="https://www.google.com/maps?q={{ object.latitude }},{{ object.longitude }}&output=embed"
+                    loading="lazy" title="Property location"></iframe>
+        </div>
+        {% endif %}
+    </div>
+
+    <aside class="sidebar">
+        <div class="price-card">
+            <div class="price-amount">{{ object.price|floatformat:0 }} DZD</div>
+            <div class="owner-info">
+                <div class="owner-name">
+                    Listed by <a href="{% url 'house-owner' object.owner.username %}" target="_blank" rel="noopener">{{ object.owner.username }}</a>
+                </div>
+                <div class="owner-contact">
+                    {% if object.owner.profile.phone_num %}
+                    <div class="contact-item">
+                        <span>Phone:</span> {{ object.owner.profile.phone_num }}
+                    </div>
+                    {% endif %}
+                    {% if object.owner.profile.tg %}
+                    <div class="contact-item">
+                        <a href="https://t.me/{{ object.owner.profile.tg }}" target="_blank" rel="noopener">Telegram</a>
+                    </div>
+                    {% endif %}
+                    {% if object.owner.profile.fb %}
+                    <div class="contact-item">
+                        <a href="https://facebook.com/{{ object.owner.profile.fb }}" target="_blank" rel="noopener">Facebook</a>
+                    </div>
+                    {% endif %}
+                    {% if object.owner.profile.ig %}
+                    <div class="contact-item">
+                        <a href="https://instagram.com/{{ object.owner.profile.ig }}" target="_blank" rel="noopener">Instagram</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% if user.is_authenticated and user == object.owner %}
+            <div class="owner-actions">
+                <a href="{% url 'update' object.access_hash %}" class="btn btn-primary">Edit Listing</a>
+                <a href="{% url 'delete' object.access_hash %}" class="btn btn-delete">Delete Listing</a>
+            </div>
+            {% else %}
+            <a href="{% url 'house-owner' object.owner.username %}" class="btn btn-primary">View All Listings</a>
+            {% endif %}
+        </div>
+    </aside>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function changeImage(imageUrl, element) {
+    document.getElementById('mainImage').src = imageUrl;
+    document.querySelectorAll('.thumbnail').forEach(thumb => thumb.classList.remove('active'));
+    element.classList.add('active');
+}
+</script>
+{% endblock %}

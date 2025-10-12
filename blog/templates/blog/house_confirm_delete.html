@@ -1,0 +1,15 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+
+{% block title %}Delete House - HouseFinder{% endblock %}
+
+{% block content %}
+<div class="container delete-container">
+    <h2>Are you sure you want to delete this house?</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <button class="btn btn-delete" type="submit">Delete</button>
+        <a href="{% url 'detail' access_hash=object.access_hash %}" class="btn btn-outline">Cancel</a>
+    </form>
+</div>
+{% endblock %}

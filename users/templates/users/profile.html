@@ -1,0 +1,110 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+
+{% block title %}Your Profile - HouseFinder{% endblock %}
+
+{% block content %}
+<div class="container profile-container">
+    <div class="profile-header">
+        <div class="profile-image-wrapper">
+            <img src="{{ user.profile.image.url }}" alt="Profile Image" class="profile-image">
+        </div>
+        <h1>{{ user.username }}</h1>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <fieldset>
+            <legend>Account Information</legend>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="{{ u_form.username.id_for_label }}">Username</label>
+                    {{ u_form.username }}
+                    {% if u_form.username.errors %}
+                        <ul class="errorlist">
+                            {% for error in u_form.username.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="{{ u_form.email.id_for_label }}">Email</label>
+                    {{ u_form.email }}
+                    {% if u_form.email.errors %}
+                        <ul class="errorlist">
+                            {% for error in u_form.email.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Contact & Profile</legend>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="{{ p_form.phone_num.id_for_label }}">Phone Number</label>
+                    {{ p_form.phone_num }}
+                    {% if p_form.phone_num.errors %}
+                        <ul class="errorlist">
+                            {% for error in p_form.phone_num.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="{{ p_form.tg.id_for_label }}">Telegram</label>
+                    {{ p_form.tg }}
+                    {% if p_form.tg.errors %}
+                        <ul class="errorlist">
+                            {% for error in p_form.tg.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="{{ p_form.fb.id_for_label }}">Facebook</label>
+                    {{ p_form.fb }}
+                    {% if p_form.fb.errors %}
+                        <ul class="errorlist">
+                            {% for error in p_form.fb.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="{{ p_form.ig.id_for_label }}">Instagram</label>
+                    {{ p_form.ig }}
+                    {% if p_form.ig.errors %}
+                        <ul class="errorlist">
+                            {% for error in p_form.ig.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="form-group full-width">
+                <label for="{{ p_form.image.id_for_label }}">Update Profile Picture</label>
+                {{ p_form.image }}
+                {% if p_form.image.errors %}
+                    <ul class="errorlist">
+                        {% for error in p_form.image.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </fieldset>
+
+        <button class="btn-submit" type="submit">Update Profile</button>
+    </form>
+</div>
+{% endblock %}

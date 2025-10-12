@@ -1,0 +1,39 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+    <div class="house-grid">
+        {% for house in houses %}
+        <a href="{% url 'detail' house.access_hash %}" class="house-card">
+            <div class="house-image-wrapper">
+                {% if house.images.first %}
+                <img src="{{ house.images.first.image.url }}" alt="{{ house.title|escape }}" class="house-image">
+                {% else %}
+                <img src="https://via.placeholder.com/400x240.png?text=No+Image" alt="No image available" class="house-image">
+                {% endif %}
+            </div>
+            <div class="house-content">
+                <h2 class="house-title">{{ house.title|escape }}</h2>
+                <p class="house-location">{{ house.municipality|escape }}, {{ house.state|escape }}</p>
+                <div class="house-price">{{ house.price|floatformat:0 }} DZD</div>
+                <div class="house-details">
+                    <span class="detail-item">{{ house.get_operation_type_display }}</span>
+                    <span class="detail-item status-badge {% if house.status == 'OCCUPIED' %}status-occupied{% else %}status-unoccupied{% endif %}">
+                        {{ house.get_status_display }}
+                    </span>
+                    <span class="detail-item">{{ house.length|floatformat:0 }}x{{ house.width|floatformat:0 }} m²</span>
+                    <span class="detail-item">{{ house.faces }} Face(s)</span>
+                </div>
+                <div class="house-footer">
+                    Posted by {{ house.owner.username }} on {{ house.pub_date|date:"M d, Y" }}
+                </div>
+            </div>
+        </a>
+        {% empty %}
+        <div class="empty-state">
+            <h2>No houses found.</h2>
+            <p>Be the first to list a house in your area!</p>
+            <a href="{% url 'create' %}" class="btn btn-primary">Post a House</a>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock content %}
+
