@@ -1,10 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'blog/base.html' %}
+{% load static %}
 
-</body>
-</html>
+{% block title %}Verify Email - HouseFinder{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h1>Email Verification</h1>
+        <p>Please enter the verification code sent to your email.</p>
+    </div>
+    
+    <form method="POST" novalidate>
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+        <div class="message error">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+        
+        <div class="form-group full-width">
+            <label for="{{ form.code.id_for_label }}">Verification Code</label>
+            {{ form.code }}
+            {% if form.code.errors %}
+            <ul class="errorlist">
+                {% for error in form.code.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        
+        <button type="submit" class="btn-submit">Verify Email</button>
+    </form>
+    
+    <div class="form-footer">
+        <p>If you haven't received a code, please check your spam folder or <a href="{% url 'register' %}">register again</a>.</p>
+    </div>
+</div>
+{% endblock %}

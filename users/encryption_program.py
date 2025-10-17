@@ -1,24 +1,20 @@
+import json
+
+from cryptography.fernet import Fernet
 from decouple import config
 
+FERNET_KEY = config('ENCRYPTION_KEY')
+fernet = Fernet(FERNET_KEY)
+
 def encryption(data: dict) -> str:
+    # Convert dict to JSON string
+    json_str = json.dumps(data)
+    # Encode to bytes and encrypt
+    encrypted = fernet.encrypt(json_str.encode())
+    return encrypted.decode()
 
-    chars = config('ENCRYPTION_KEY')
-    key = chars.copy
-
-    cipher_data = ""
-    for letter in data:
-        index = chars.index(letter)
-        cipher_data += chars[index]
-    return cipher_data
-
-def decryption(cipher_data: str) -> dict :
-
-    chars = config('ENCRYPTION_KEY')
-    key = chars
-
-    data = ""
-    for letter in cipher_data:
-        index = chars.index(letter)
-        data += chars[index]
-
-    return data
+def decryption(encrypted_data: str) -> dict:
+    # Decode and decrypt
+    decrypted_bytes = fernet.decrypt(encrypted_data.encode())
+    # Convert back to dict
+    return json.loads(decrypted_bytes.decode())

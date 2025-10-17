@@ -11,6 +11,7 @@ from django.contrib.auth.views import (
     PasswordResetView, PasswordResetDoneView,
     PasswordResetConfirmView, PasswordResetCompleteView
 )
+from django.urls import reverse
 
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, EmailVerifyForm
 from .encryption_program import encryption, decryption
@@ -23,7 +24,6 @@ def register(request):
 
         if form.is_valid():
             generated_code = uuid.uuid4().hex[:5]
-            path_code = uuid.uuid4().hex[:6]
             user_email = form.cleaned_data.get('email')
 
             send_mail(
@@ -37,49 +37,33 @@ def register(request):
             context = {
                 'code': generated_code,
                 'form_data': form.cleaned_data,
-                'path': path_code
             }
 
-            #encrypted_data = encryption(context)
+            encrypted_data = encryption(context)
 
-            return render(request, f'users/verify_email.html', {
-                'verify_form': EmailVerifyForm(),
-                'context': context,
-                #'user_email': user_email,
-            })
+            return redirect('verify-email', data=encrypted_data)
     else:
         form = UserRegisterForm()
 
     return render(request, 'users/register.html', {'form': form})
 
-def verify_email(request, path_code):
+def verify_email(request, data):
     if request.method == 'POST':
-        user_code = request.POST.get('code')
-
-
-        try:
-            context = request.POST.get('context')
-            #context = decryption(encrypted_data)
-        except Exception:
-            messages.error(request, "Invalid verification data.")
-            return redirect('register')
-
-        if user_code == context['code']:
-            form_data = context['form_data']
-            form = UserRegisterForm(form_data)
-            if form.is_valid():
-                form.save()
-                username = form.cleaned_data.get('username')
-                messages.success(request, f'Your account has been created Mr. {username}! You are now able to log in.')
+        e_form = EmailVerifyForm(request.POST)
+        decrypted_data = decryption(data)
+        if e_form.is_valid():
+            if e_form.cleaned_data.get("code") == decrypted_data['code']:
+                r_form = UserRegisterForm(decrypted_data['form_data'])
+                r_form.save()
+                username = r_form.cleaned_data.get('username')
+                messages.success(request, f'Your account has been created Mr.{username}, Now you can log-in')
                 return redirect('login')
             else:
-                messages.error(request, "Form data invalid during verification.")
-        else:
-            messages.error(request, "Invalid verification code.")
+                messages.error(request, 'You have entered the wrong code, please verify your code')
     else:
-        verify = EmailVerifyForm()
+        e_form = EmailVerifyForm()
 
-    return render(request, 'users/verify_email.html', {'verify': verify})
+    return render(request, 'users/verify_email.html', {'form': e_form})
 
 def logout_view(request):
 

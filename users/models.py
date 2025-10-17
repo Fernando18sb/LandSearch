@@ -1,5 +1,3 @@
-import uuid
-
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -7,7 +5,7 @@ class GeneratedCode(models.Model):
     code = models.CharField(max_length=5, null=True, blank=True)
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)
     phone_num = models.CharField(max_length=10, blank=True)
     tg = models.CharField(
         max_length=30,
@@ -25,11 +23,8 @@ class Profile(models.Model):
         blank=True,
     )
     image = models.ImageField(default='default.jpg', upload_to='profile_pics')
-    path = models.CharField(max_length=6, null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        if self.path is None:
-            self.path = uuid.uuid4().hex[:6]
         return super().save(*args, **kwargs)
 
     def __str__(self):

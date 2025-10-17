@@ -12,7 +12,7 @@ urlpatterns = [
     path('accounts/login/', LoginView.as_view(template_name='users/login.html'), name='login'),
     path('logout/', logout_view, name='logout'),
     path('accounts/profile/', profile, name='profile'),
-    path('verify/', verify_email, name='verify-email'),
+    path('verify/<data>', verify_email, name='verify-email'),
     path(
         'password-reset/',
          PasswordReset.as_view(
