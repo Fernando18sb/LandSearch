@@ -11,7 +11,6 @@ from django.contrib.auth.views import (
     PasswordResetView, PasswordResetDoneView,
     PasswordResetConfirmView, PasswordResetCompleteView
 )
-from django.urls import reverse
 
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, EmailVerifyForm
 from .encryption_program import encryption, decryption
